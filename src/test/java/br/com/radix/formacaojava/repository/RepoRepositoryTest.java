@@ -1,7 +1,6 @@
 package br.com.radix.formacaojava.repository;
 
 import br.com.radix.formacaojava.model.Repo;
-import br.com.radix.formacaojava.model.Technology;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
@@ -12,7 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RepoRepositoryTest {
@@ -22,6 +21,18 @@ public class RepoRepositoryTest {
 
     @Mock
     private JpaRepoRepository jpaRepository;
+
+    @Test
+    public void findAllTestOk() {
+        Repo fakeRepo1 = new Repo("TestRepo", "https://myrepo.com");
+        Repo fakeRepo2 = new Repo("TestRepo", "https://myrepo2.com");
+        List<Repo> fakeRepos = Arrays.asList(fakeRepo1,fakeRepo2);
+        when(jpaRepository.findAll()).thenReturn(fakeRepos);
+
+        List<Repo> repos = repository.findAll();
+
+        Assertions.assertEquals(fakeRepos, repos);
+    }
 
     @Test
     public void findByIdTestOk() {
@@ -52,24 +63,11 @@ public class RepoRepositoryTest {
 
     @Test
     public void checkIfUrlIsAvailableTestFail() {
-//        String fakeUrl = "https://myrepo.com";
-//        Repo fakeRepoNew = new Repo("TestRepo", "https://myrepo1.com");
-//        Long fakeId = 1L;
-//
-//        Technology fakeTech1 = new Technology("Tech1");
-//        Technology fakeTech2 = new Technology("Tech2");
-//        Set<Technology> fakeTechs = new HashSet<>(Arrays.asList(fakeTech1, fakeTech2));
-//        fakeRepo.setTechnologies(fakeTechs);
-//
-//        when(repository.findByIdOrFail(fakeId)).thenReturn(fakeRepo);
-//        when(technologyService.findOrCreateMany(fakeRepo.getTechnologies())).thenReturn(fakeTechs);
-//
-//        Repo repo = service.create(fakeRepo);
-//
-//        Assertions.assertEquals(fakeRepo, repo);Repo fakeRepo = new Repo("TestRepo", fakeUrl);
-//        when(jpaRepository.findByUrl(fakeUrl)).thenReturn(Collections.singletonList(fakeRepo));
-//
-//        Assertions.assertThrows(ResponseStatusException.class, () -> repository.checkIfUrlIsAvailableOrFail(fakeUrl));
+        String fakeUrl = "https://myrepo.com";
+        Repo fakeRepo = new Repo("TestRepo", fakeUrl);
+        when(jpaRepository.findByUrl(fakeUrl)).thenReturn(Collections.singletonList(fakeRepo));
+
+        Assertions.assertThrows(ResponseStatusException.class, () -> repository.checkIfUrlIsAvailableOrFail(fakeUrl));
     }
 
     @Test
@@ -84,8 +82,18 @@ public class RepoRepositoryTest {
     @Test
     public void saveTestOk() {
         Repo fakeRepo = new Repo("TestRepo", "https://myrepo.com");
-        when(jpaRepository.save(fakeRepo)).thenReturn(fakeRepo);
 
-        Assertions.assertDoesNotThrow(() -> repository.save(fakeRepo));
+        repository.save(fakeRepo);
+
+        verify(jpaRepository).save(fakeRepo);
+    }
+
+    @Test
+    public void deleteTestOk() {
+        Repo fakeRepo = new Repo("TestRepo", "https://myrepo.com");
+
+        repository.delete(fakeRepo);
+
+        verify(jpaRepository).delete(fakeRepo);
     }
 }

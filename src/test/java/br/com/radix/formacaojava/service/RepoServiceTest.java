@@ -12,6 +12,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.*;
 
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -28,45 +29,64 @@ public class RepoServiceTest {
 
     @Test
     public void listTest() {
-        Repo fakeRepo1 = new Repo("TestRepo1", "https://myrepo1.com");
-        Repo fakeRepo2 = new Repo("TestRepo2", "https://myrepo2.com");
-        Repo fakeRepo3 = new Repo("TestRepo3", "https://myrepo3.com");
-        List<Repo> allFakeRepos = new ArrayList<>(Arrays.asList(fakeRepo1, fakeRepo2, fakeRepo3));
-        when(repository.findAll()).thenReturn(allFakeRepos);
+        service.list();
 
-        List<Repo> allRepos = service.list();
-
-        Assertions.assertEquals(allFakeRepos, allRepos);
+        verify(repository).findAll();
     }
 
     @Test
     public void getTest() {
-        Repo fakeRepo = new Repo("TestRepo", "https://myrepo1.com");
         Long fakeId = 1L;
-        when(repository.findByIdOrFail(fakeId)).thenReturn(fakeRepo);
 
-        Repo repo = repository.findByIdOrFail(fakeId);
+        service.get(fakeId);
 
-        Assertions.assertEquals(fakeRepo, repo);
+        verify(repository).findByIdOrFail(fakeId);
     }
 
     @Test
     public void createTest() {
-        Repo fakeRepo = new Repo("TestRepo", "https://myrepo1.com");
+        Repo fakeRepo = new Repo("TestRepo", "https://myrepo.com");
         Technology fakeTech1 = new Technology("Tech1");
         Technology fakeTech2 = new Technology("Tech2");
         Set<Technology> fakeTechs = new HashSet<>(Arrays.asList(fakeTech1, fakeTech2));
         fakeRepo.setTechnologies(fakeTechs);
-        when(repository.save(fakeRepo)).thenReturn(fakeRepo);
+
         when(technologyService.findOrCreateMany(fakeRepo.getTechnologies())).thenReturn(fakeTechs);
+        when(repository.save(fakeRepo)).thenReturn(fakeRepo);
 
         Repo repo = service.create(fakeRepo);
 
+        verify(repository).checkIfUrlIsAvailableOrFail(fakeRepo.getUrl());
         Assertions.assertEquals(fakeRepo, repo);
     }
 
     @Test
     public void updateTest() {
+        Long fakeId = 1L;
+        Repo fakeRepo = new Repo("TestRepo", "https://myrepo.com");
+        Technology fakeTech1 = new Technology("Tech1");
+        Technology fakeTech2 = new Technology("Tech2");
+        Set<Technology> fakeTechs = new HashSet<>(Arrays.asList(fakeTech1, fakeTech2));
+        fakeRepo.setTechnologies(fakeTechs);
 
+        when(repository.findByIdOrFail(fakeId)).thenReturn(fakeRepo);
+        when(technologyService.findOrCreateMany(fakeRepo.getTechnologies())).thenReturn(fakeTechs);
+        when(repository.save(fakeRepo)).thenReturn(fakeRepo);
+
+        Repo repo = service.update(fakeId, fakeRepo);
+
+        verify(repository).checkIfUrlIsAvailableOrFail(fakeRepo.getUrl(), fakeRepo.getUrl());
+        Assertions.assertEquals(fakeRepo, repo);
+    }
+
+    @Test
+    public void deleteTest() {
+        Long fakeId = 1L;
+        Repo fakeRepo = new Repo("TestRepo", "https://myrepo.com");
+        when(repository.findByIdOrFail(fakeId)).thenReturn(fakeRepo);
+
+        service.delete(fakeId);
+
+        verify(repository).delete(fakeRepo);
     }
 }
