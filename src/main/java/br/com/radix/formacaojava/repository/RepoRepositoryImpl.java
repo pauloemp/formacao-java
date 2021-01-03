@@ -2,12 +2,17 @@ package br.com.radix.formacaojava.repository;
 
 import br.com.radix.formacaojava.model.Repo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
+
+interface JpaRepoRepository extends JpaRepository<Repo, Long> {
+    List<Repo> findByUrl(String url);
+}
 
 @Repository
 public class RepoRepositoryImpl implements RepoRepository{

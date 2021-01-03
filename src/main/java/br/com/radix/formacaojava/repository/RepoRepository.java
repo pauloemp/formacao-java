@@ -1,7 +1,6 @@
 package br.com.radix.formacaojava.repository;
 
 import br.com.radix.formacaojava.model.Repo;
-import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
@@ -14,6 +13,3 @@ public interface RepoRepository {
     void delete(Repo repo);
 }
 
-interface JpaRepoRepository extends JpaRepository<Repo, Long> {
-    List<Repo> findByUrl(String url);
-}

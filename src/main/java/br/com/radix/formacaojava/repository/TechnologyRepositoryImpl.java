@@ -2,12 +2,17 @@ package br.com.radix.formacaojava.repository;
 
 import br.com.radix.formacaojava.model.Technology;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
+
+interface JpaTechnologyRepository extends JpaRepository<Technology, Long> {
+    List<Technology> findByName(String name);
+}
 
 @Repository
 public class TechnologyRepositoryImpl implements TechnologyRepository {
